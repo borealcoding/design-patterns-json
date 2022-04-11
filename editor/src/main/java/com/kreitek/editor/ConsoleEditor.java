@@ -5,7 +5,7 @@ import com.kreitek.editor.commands.CommandFactory;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class ConsoleEditor implements Editor {
+public class ConsoleEditor<JSONObject> implements Editor {
     public static final String TEXT_RESET = "\u001B[0m";
     public static final String TEXT_BLACK = "\u001B[30m";
     public static final String TEXT_RED = "\u001B[31m";
@@ -17,7 +17,12 @@ public class ConsoleEditor implements Editor {
     public static final String TEXT_WHITE = "\u001B[37m";
 
     private final CommandFactory commandFactory = new CommandFactory();
+    private final String viewMode;
     private ArrayList<String> documentLines = new ArrayList<String>();
+
+    public ConsoleEditor(String viewMode) {
+        this.viewMode = viewMode;
+    }
 
     @Override
     public void run() {
@@ -37,19 +42,37 @@ public class ConsoleEditor implements Editor {
         }
     }
 
+    private void printDocumentInText(ArrayList<String> textLines) {
+        printLnToConsole("START DOCUMENT ==>");
+        for (int index = 0; index < textLines.size(); index++) {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("[");
+            stringBuilder.append(index);
+            stringBuilder.append("] ");
+            stringBuilder.append(textLines.get(index));
+            printLnToConsole(stringBuilder.toString());
+        }
+        printLnToConsole("<== END DOCUMENT");
+    }
+
+    private void printDocumentInJson(ArrayList<String> textLines) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("{\n");
+        stringBuilder.append(" \"doc\":[\n");
+        for (int index = 0; index < textLines.size(); index++) {
+            stringBuilder.append("  {\"line\":\"").append(index);
+            stringBuilder.append("\",\"text\":\"").append(textLines.get(index)).append("\"},\n");
+        }
+        stringBuilder.append(" ]\n");
+        stringBuilder.append("}");
+        printLnToConsole(stringBuilder.toString());
+    }
+
     private void showDocumentLines(ArrayList<String> textLines) {
         if (textLines.size() > 0){
             setTextColor(TEXT_YELLOW);
-            printLnToConsole("START DOCUMENT ==>");
-            for (int index = 0; index < textLines.size(); index++) {
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.append("[");
-                stringBuilder.append(index);
-                stringBuilder.append("] ");
-                stringBuilder.append(textLines.get(index));
-                printLnToConsole(stringBuilder.toString());
-            }
-            printLnToConsole("<== END DOCUMENT");
+            if (viewMode.equalsIgnoreCase("text")) { printDocumentInText(textLines); }
+            if (viewMode.equalsIgnoreCase("json")) { printDocumentInJson(textLines); }
             setTextColor(TEXT_RESET);
         }
     }

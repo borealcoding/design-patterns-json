@@ -1,6 +1,12 @@
-INTELLIJ IDEA ---
+# INTELLIJ IDEA ---
 
 .idea/
 
-CONFIGURATION FILES ---
+# CONFIGURATION FILES ---
 *.iml
+
+# COMPILED CLASS FILE
+*.class
+
+# LOG FILE
+*.log
